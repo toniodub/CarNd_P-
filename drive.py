@@ -16,6 +16,8 @@ from keras.models import model_from_json
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array
 
 # Fix error with Keras and TensorFlow
+#Test to see if git commit branch work
+#deuxieme test
 import tensorflow as tf
 tf.python.control_flow_ops = tf
 
