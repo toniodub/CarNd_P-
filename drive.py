@@ -15,9 +15,6 @@ from io import BytesIO
 from keras.models import model_from_json
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array
 
-# Fix error with Keras and TensorFlow
-#Test to see if git commit branch work
-#troisieme test
 import tensorflow as tf
 tf.python.control_flow_ops = tf
 
@@ -38,6 +35,7 @@ def telemetry(sid, data):
     # The current image from the center camera of the car
     imgString = data["image"]
     image = Image.open(BytesIO(base64.b64decode(imgString)))
+    image= image.crop((0,60,320,135))
     image_array = np.asarray(image)
     transformed_image_array = image_array[None, :, :, :]
     # This model currently assumes that the features of the model are just the images. Feel free to change this.
@@ -70,10 +68,10 @@ if __name__ == '__main__':
         # NOTE: if you saved the file by calling json.dump(model.to_json(), ...)
         # then you will have to call:
         #
-        #   model = model_from_json(json.loads(jfile.read()))\
+        model = model_from_json(json.loads(jfile.read()))\
         #
         # instead.
-        model = model_from_json(jfile.read())
+        #model = model_from_json(jfile.read())
 
 
     model.compile("adam", "mse")

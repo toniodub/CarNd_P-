@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 #file containing the The script used to create and train the model.
-
+import cv2
 from PIL import Image                                                            
 import numpy as np                                                                     
 import matplotlib.pyplot as plt                                                  
@@ -11,40 +11,74 @@ import pandas as pd
 import json
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
-from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Flatten, Dropout
 from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 from keras.models import load_model
+from keras.optimizers import *
 from sklearn.utils import shuffle
 
-#load data
+
+# function that sort the input based on the steering value
+def steering_filtering(X, y, steering):
+	index_out=np.where(abs(y)>=steering)
+	y_out=y[index_out[0]]
+	X_out=X[index_out[0]]
+	return X_out, y_out
+	
+
+
+
+#load data center
 imageFolderPath = 'data/IMG/'
 imagePath = glob.glob(imageFolderPath+'center*.jpg') 
 
 #load and crop the data to remove sky and car
-X_data = np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
-
-
-print('shape of input data is : ')
-print(np.shape(X_data))
+X_data_center = np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
 
 #load output
 with open('data/driving_log.csv') as csv_file:
 	df = pd.read_csv(csv_file)
-	steering_data = df.steering
-	throttle_data = df.throttle
-	brake_data = df.brake
-	speed_data = df.speed
+	steering_data_center = df.steering.values
+	throttle_data = df.throttle.values
+	brake_data = df.brake.values
+	speed_data = df.speed.values
+
+#load data left
+imagePath = glob.glob(imageFolderPath+'left*.jpg') 
+#load and crop the data to remove sky and car
+X_data_left = np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
+steering_data_left=steering_data_center+0.25
+
+#load data right
+imagePath = glob.glob(imageFolderPath+'right*.jpg') 
+X_data_right=np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
+steering_data_right=steering_data_center-0.25
+
+
+
+print('preprocessing data')
+X_data_temp=np.concatenate((X_data_center,X_data_right,X_data_left))
+steering_data_temp=np.concatenate((steering_data_center,steering_data_right,steering_data_left))
+
+#flipping image
+X_data_flip=X_data_temp
+for n in range(np.shape(X_data_temp)[0]):
+	X_data_flip[n,:,:,0]=cv2.flip(X_data_temp[n,:,:,0],flipCode=0)
+	X_data_flip[n,:,:,1]=cv2.flip(X_data_temp[n,:,:,1],flipCode=0)
+	X_data_flip[n,:,:,2]=cv2.flip(X_data_temp[n,:,:,2],flipCode=0)
+
+steering_data_flip=-steering_data_temp
+
+X_data=np.concatenate((X_data_temp,X_data_flip))
+steering_data=np.concatenate((steering_data_temp,steering_data_flip))
+
+#shuffle data
+X_data, steering_data = shuffle(X_data, steering_data) 
 
 #print crop image
 img = Image.fromarray(X_data[0])
 img.show()
-
-print('preprocessing data')
-#shuffle data
-X_data, steering_data = shuffle(X_data, steering_data) 
-
 
 #create test data separated from validation
 X_test=X_data[0:1000]
@@ -65,12 +99,8 @@ steering_train = steering_data[1500:-1]
 #preprocessing
 datagen = ImageDataGenerator(
         rotation_range=20,
-        width_shift_range=0,
         height_shift_range=0.2,
         rescale=1./255,
-        shear_range=0,
-        zoom_range=0,
-        horizontal_flip=False,
         fill_mode='nearest')
 
 
@@ -81,35 +111,69 @@ model = Sequential()
 #1x1 kernel 3 output
 model.add(Convolution2D(3, 1, 1, input_shape=(75, 320, 3)))
 
-#3x3 kernel 32 output
-model.add(Convolution2D(32, 3, 3))
+#5x5 kernel 32 output
+model.add(Convolution2D(24, 5, 5))
 model.add(Activation('relu'))
 model.add(MaxPooling2D((2, 2)))
-model.add(Dropout(0.5))
 
+#5x5 kernel 32 output
+model.add(Convolution2D(36, 5, 5))
+model.add(Activation('relu'))
+model.add(MaxPooling2D((2, 2)))
+
+#5x5 kernel 32 output
+model.add(Convolution2D(48, 5, 5))
+model.add(Activation('relu'))
+model.add(MaxPooling2D((2, 2)))
+
+#5x5 kernel 32 output
+model.add(Convolution2D(64, 3, 3))
+model.add(Activation('relu'))
+
+model.add(Convolution2D(64, 3, 3))
+model.add(Activation('relu'))
+
+model.add(Dropout(0.8))
 
 model.add(Flatten())
-model.add(Dense(128))
+model.add(Dense(1000))
 model.add(Activation('relu'))
+model.add(Dropout(0.8))
+
+model.add(Dense(100))
+model.add(Activation('relu'))
+model.add(Dropout(0.8))
+
+model.add(Dense(10))
+model.add(Activation('relu'))
+model.add(Dropout(0.8))
 
 model.add(Dense(1))
 #model.add(Activation('softmax'))
 
 #compile model
-model.compile('adam', 'mean_squared_error', ['accuracy'])
+model.compile(Adam(lr=0.002), 'mean_squared_error')
 datagen.fit(X_train)
 
 
 
 print('start training')
 nb_epoch=1
-batch_size=128
+batch_size=256
 
-train_gen=datagen.flow(X_train, steering_train, batch_size=batch_size)
 val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
 
-# fits the model on batches with real-time data augmentation:
-history=model.fit_generator(train_gen, samples_per_epoch=len(X_train), nb_epoch=nb_epoch,validation_data=val_gen, nb_val_samples=500)
+for steering_th in range(30,0,-5):
+	print('steering threshold:')
+	print(steering_th/100)
+	[X_train_temp, steering_train_temp]=steering_filtering(X_train,steering_train,steering_th/100)
+	datagen.fit(X_train_temp)
+	train_gen=datagen.flow(X_train_temp, steering_train_temp, batch_size=batch_size)
+
+	# fits the model on batches with real-time data augmentation:
+	history=model.fit_generator(train_gen, samples_per_epoch=len(X_train_temp), 	nb_epoch=steering_th/5+1,validation_data=val_gen, nb_val_samples=500)
+
+print()
 
 #print(history.history.keys())
 # summarize history for accuracy
@@ -135,7 +199,7 @@ print('test score:')
 print(test_score)
 
 print('exporting model H5')
-model.save('my_model.h5')
+model.save('my_model_arch.h5')
 
 print('exporting model json')
 json_string = model.to_json()
@@ -143,7 +207,7 @@ with open('model.json', 'w') as outfile:
     json.dump(json_string, outfile)
 
 print('exporting model weight H5')
-model.save_weights('my_model_weights.h5')
+model.save_weights('model.h5')
 
 
 
