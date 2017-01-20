@@ -162,12 +162,12 @@ else:
 datagen.fit(X_train)
 
 print('start training')
-nb_epoch=2
+nb_epoch=3
 batch_size=256
 
 val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
 
-for steering_th in range(25,25,-5):
+for steering_th in range(30,25,-5):
 	print('steering threshold:')
 	print(steering_th/100)
 	[X_train_temp, steering_train_temp]=steering_filtering(X_train,steering_train,steering_th/100)
