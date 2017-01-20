@@ -160,7 +160,7 @@ datagen.fit(X_train)
 
 
 print('start training')
-nb_epoch=1
+nb_epoch=5
 batch_size=256
 
 val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
@@ -173,7 +173,7 @@ for steering_th in range(30,0,-5):
 	train_gen=datagen.flow(X_train_temp, steering_train_temp, batch_size=batch_size)
 
 	# fits the model on batches with real-time data augmentation:
-	history=model.fit_generator(train_gen, samples_per_epoch=min(len(X_train_temp),20000), 	nb_epoch=1,validation_data=val_gen, nb_val_samples=500)
+	model.fit_generator(train_gen, samples_per_epoch=min(len(X_train_temp),2000), nb_epoch=1)
 	gc.collect()
 
 print()
