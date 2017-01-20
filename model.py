@@ -167,7 +167,7 @@ batch_size=256
 
 val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
 
-for steering_th in range(25,10,-5):
+for steering_th in range(25,20,-5):
 	print('steering threshold:')
 	print(steering_th/100)
 	[X_train_temp, steering_train_temp]=steering_filtering(X_train,steering_train,steering_th/100)
