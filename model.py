@@ -106,7 +106,7 @@ datagen = ImageDataGenerator(
         fill_mode='nearest')
 
 
-if INIT_MODEL==1:
+if INIT_MODEL==0:
 # create model
 	print('creating model')
 
