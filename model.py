@@ -9,6 +9,7 @@ import glob
 import csv
 import pandas as pd
 import json
+import gc
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Flatten, Dropout
@@ -29,6 +30,7 @@ def steering_filtering(X, y, steering):
 
 
 print('version 2.0')
+gc.collect()
 #load data center
 imageFolderPath = 'data/IMG/'
 imagePath = glob.glob(imageFolderPath+'center*.jpg') 
