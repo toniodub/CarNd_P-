@@ -2,6 +2,7 @@
 
 #file containing the The script used to create and train the model.
 import cv2
+import base64
 from PIL import Image                                                            
 import numpy as np                                                                     
 import matplotlib.pyplot as plt                                                  
