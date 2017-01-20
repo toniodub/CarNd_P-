@@ -112,7 +112,7 @@ if INIT_MODEL==1:
 
 	model = Sequential()
 	#1x1 kernel 3 output
-	model.add(Convolution2D(24, 5, 5, subsample=(2,2), border_mode='valid' input_shape=(75, 320, 3)))
+	model.add(Convolution2D(24, 5, 5, subsample=(2,2), border_mode='valid', input_shape=(75, 320, 3)))
 
 	#5x5 kernel 32 output
 	model.add(Activation('relu'))
