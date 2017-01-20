@@ -20,7 +20,7 @@ from keras.models import model_from_json
 from keras.optimizers import *
 from sklearn.utils import shuffle
 
-INIT_MODEL=0
+INIT_MODEL=1
 
 # function that sort the input based on the steering value
 def steering_filtering(X, y, steering):
@@ -112,47 +112,40 @@ if INIT_MODEL==1:
 
 	model = Sequential()
 	#1x1 kernel 3 output
-	model.add(Convolution2D(3, 1, 1, input_shape=(75, 320, 3)))
+	model.add(Convolution2D(24, 5, 5, subsample=(2,2), border_mode='valid' input_shape=(75, 320, 3)))
 
 	#5x5 kernel 32 output
-	model.add(Convolution2D(24, 5, 5))
 	model.add(Activation('relu'))
-	model.add(MaxPooling2D((2, 2)))
 
 	#5x5 kernel 32 output
-	model.add(Convolution2D(36, 5, 5))
+	model.add(Convolution2D(36, 5, 5, subsample=(2,2), border_mode='valid')
 	model.add(Activation('relu'))
-	model.add(MaxPooling2D((2, 2)))
 
 	#5x5 kernel 32 output
-	model.add(Convolution2D(48, 5, 5))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D((2, 2)))
-
-	#5x5 kernel 32 output
-	model.add(Convolution2D(64, 3, 3))
+	model.add(Convolution2D(48, 5, 5, subsample=(2,2), border_mode='valid')
 	model.add(Activation('relu'))
 
-	model.add(Convolution2D(64, 3, 3))
+	#3x3 kernel 32 output
+	model.add(Convolution2D(64, 3, 3, border_mode='valid')
 	model.add(Activation('relu'))
 
-	model.add(Dropout(0.8))
+	model.add(Convolution2D(64, 3, 3, border_mode='valid')
+	model.add(Activation('relu'))
 
 	model.add(Flatten())
-	model.add(Dense(1000))
+	model.add(Dense(1164))
 	model.add(Activation('relu'))
-	model.add(Dropout(0.8))
 
 	model.add(Dense(100))
 	model.add(Activation('relu'))
-	model.add(Dropout(0.8))
-
-	model.add(Dense(10))
+	
+	model.add(Dense(100))
 	model.add(Activation('relu'))
-	model.add(Dropout(0.8))
+
+	model.add(Dense(50))
+	model.add(Activation('relu'))
 
 	model.add(Dense(1))
-	#model.add(Activation('softmax'))
 
 	#compile model
 	model.compile(Adam(lr=0.002), 'mse')
@@ -169,7 +162,7 @@ else:
 datagen.fit(X_train)
 
 print('start training')
-nb_epoch=5
+nb_epoch=2
 batch_size=256
 
 val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
