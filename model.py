@@ -19,6 +19,7 @@ from keras.models import load_model
 from keras.optimizers import *
 from sklearn.utils import shuffle
 
+INIT_MODEL=1
 
 # function that sort the input based on the steering value
 def steering_filtering(X, y, steering):
@@ -26,8 +27,6 @@ def steering_filtering(X, y, steering):
 	y_out=y[index_out[0]]
 	X_out=X[index_out[0]]
 	return X_out, y_out
-	
-
 
 print('version 2.0')
 gc.collect()
@@ -106,58 +105,72 @@ datagen = ImageDataGenerator(
         fill_mode='nearest')
 
 
+if INIT_MODEL==1:
 # create model
-print('creating model')
+	print('creating model')
 
-model = Sequential()
-#1x1 kernel 3 output
-model.add(Convolution2D(3, 1, 1, input_shape=(75, 320, 3)))
+	model = Sequential()
+	#1x1 kernel 3 output
+	model.add(Convolution2D(3, 1, 1, input_shape=(75, 320, 3)))
 
-#5x5 kernel 32 output
-model.add(Convolution2D(24, 5, 5))
-model.add(Activation('relu'))
-model.add(MaxPooling2D((2, 2)))
+	#5x5 kernel 32 output
+	model.add(Convolution2D(24, 5, 5))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D((2, 2)))
 
-#5x5 kernel 32 output
-model.add(Convolution2D(36, 5, 5))
-model.add(Activation('relu'))
-model.add(MaxPooling2D((2, 2)))
+	#5x5 kernel 32 output
+	model.add(Convolution2D(36, 5, 5))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D((2, 2)))
 
-#5x5 kernel 32 output
-model.add(Convolution2D(48, 5, 5))
-model.add(Activation('relu'))
-model.add(MaxPooling2D((2, 2)))
+	#5x5 kernel 32 output
+	model.add(Convolution2D(48, 5, 5))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D((2, 2)))
 
-#5x5 kernel 32 output
-model.add(Convolution2D(64, 3, 3))
-model.add(Activation('relu'))
+	#5x5 kernel 32 output
+	model.add(Convolution2D(64, 3, 3))
+	model.add(Activation('relu'))
 
-model.add(Convolution2D(64, 3, 3))
-model.add(Activation('relu'))
+	model.add(Convolution2D(64, 3, 3))
+	model.add(Activation('relu'))
 
-model.add(Dropout(0.8))
+	model.add(Dropout(0.8))
 
-model.add(Flatten())
-model.add(Dense(1000))
-model.add(Activation('relu'))
-model.add(Dropout(0.8))
+	model.add(Flatten())
+	model.add(Dense(1000))
+	model.add(Activation('relu'))
+	model.add(Dropout(0.8))
 
-model.add(Dense(100))
-model.add(Activation('relu'))
-model.add(Dropout(0.8))
+	model.add(Dense(100))
+	model.add(Activation('relu'))
+	model.add(Dropout(0.8))
 
-model.add(Dense(10))
-model.add(Activation('relu'))
-model.add(Dropout(0.8))
+	model.add(Dense(10))
+	model.add(Activation('relu'))
+	model.add(Dropout(0.8))
 
-model.add(Dense(1))
-#model.add(Activation('softmax'))
+	model.add(Dense(1))
+	#model.add(Activation('softmax'))
 
-#compile model
-model.compile(Adam(lr=0.002), 'mean_squared_error')
+	#compile model
+	model.compile(Adam(lr=0.002), 'mse')
+else:
+	with open('model.json', 'r') as jfile:
+        # NOTE: if you saved the file by calling json.dump(model.to_json(), ...)
+        # then you will have to call:
+        #
+        model = model_from_json(json.loads(jfile.read()))\
+        #
+        # instead.
+        #model = model_from_json(jfile.read())
+
+
+    	model.compile("adam", "mse")
+    	model.load_weights('model.h5')
+
+
 datagen.fit(X_train)
-
-
 
 print('start training')
 nb_epoch=5
@@ -173,7 +186,7 @@ for steering_th in range(30,0,-5):
 	train_gen=datagen.flow(X_train_temp, steering_train_temp, batch_size=batch_size)
 
 	# fits the model on batches with real-time data augmentation:
-	model.fit_generator(train_gen, samples_per_epoch=min(len(X_train_temp),2000), nb_epoch=1)
+	model.fit_generator(train_gen, samples_per_epoch=min(len(X_train_temp),2000), nb_epoch=nb_epoch)
 	gc.collect()
 
 print()
