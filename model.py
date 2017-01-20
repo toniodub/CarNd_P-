@@ -28,7 +28,7 @@ def steering_filtering(X, y, steering):
 	
 
 
-
+print('version 2.0')
 #load data center
 imageFolderPath = 'data/IMG/'
 imagePath = glob.glob(imageFolderPath+'center*.jpg') 
@@ -171,7 +171,7 @@ for steering_th in range(30,0,-5):
 	train_gen=datagen.flow(X_train_temp, steering_train_temp, batch_size=batch_size)
 
 	# fits the model on batches with real-time data augmentation:
-	history=model.fit_generator(train_gen, samples_per_epoch=len(X_train_temp), 	nb_epoch=1,validation_data=val_gen, nb_val_samples=500)
+	history=model.fit_generator(train_gen, samples_per_epoch=max(len(X_train_temp),30000), 	nb_epoch=1,validation_data=val_gen, nb_val_samples=500)
 
 print()
 
