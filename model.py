@@ -16,6 +16,7 @@ from keras.layers.core import Dense, Activation, Flatten, Dropout
 from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 from keras.models import load_model
+from keras.models import model_from_json
 from keras.optimizers import *
 from sklearn.utils import shuffle
 
@@ -156,6 +157,7 @@ if INIT_MODEL==1:
 	#compile model
 	model.compile(Adam(lr=0.002), 'mse')
 else:
+	print('loading model')
 	with open('model.json', 'r') as jfile:
        
         	model = model_from_json(json.loads(jfile.read()))
