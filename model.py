@@ -62,11 +62,11 @@ X_data_temp=np.concatenate((X_data_center,X_data_right,X_data_left))
 steering_data_temp=np.concatenate((steering_data_center,steering_data_right,steering_data_left))
 
 #flipping image
-X_data_flip=X_data_temp
+X_data_flip=np.zeros(np.shape(X_data_temp),dtype=np.uint8)
 for n in range(np.shape(X_data_temp)[0]):
-	X_data_flip[n,:,:,0]=cv2.flip(X_data_temp[n,:,:,0],flipCode=0)
-	X_data_flip[n,:,:,1]=cv2.flip(X_data_temp[n,:,:,1],flipCode=0)
-	X_data_flip[n,:,:,2]=cv2.flip(X_data_temp[n,:,:,2],flipCode=0)
+	X_data_flip[n,:,:,0]=cv2.flip(X_data_temp[n,:,:,0],flipCode=1)
+	X_data_flip[n,:,:,1]=cv2.flip(X_data_temp[n,:,:,1],flipCode=1)
+	X_data_flip[n,:,:,2]=cv2.flip(X_data_temp[n,:,:,2],flipCode=1)
 
 steering_data_flip=-steering_data_temp
 
@@ -171,7 +171,7 @@ for steering_th in range(30,0,-5):
 	train_gen=datagen.flow(X_train_temp, steering_train_temp, batch_size=batch_size)
 
 	# fits the model on batches with real-time data augmentation:
-	history=model.fit_generator(train_gen, samples_per_epoch=len(X_train_temp), 	nb_epoch=steering_th/5+1,validation_data=val_gen, nb_val_samples=500)
+	history=model.fit_generator(train_gen, samples_per_epoch=len(X_train_temp), 	nb_epoch=1,validation_data=val_gen, nb_val_samples=500)
 
 print()
 
