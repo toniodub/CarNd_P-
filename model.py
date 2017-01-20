@@ -118,18 +118,18 @@ if INIT_MODEL==1:
 	model.add(Activation('relu'))
 
 	#5x5 kernel 32 output
-	model.add(Convolution2D(36, 5, 5, subsample=(2,2), border_mode='valid')
+	model.add(Convolution2D(36, 5, 5, subsample=(2,2), border_mode='valid'))
 	model.add(Activation('relu'))
 
 	#5x5 kernel 32 output
-	model.add(Convolution2D(48, 5, 5, subsample=(2,2), border_mode='valid')
+	model.add(Convolution2D(48, 5, 5, subsample=(2,2), border_mode='valid'))
 	model.add(Activation('relu'))
 
 	#3x3 kernel 32 output
-	model.add(Convolution2D(64, 3, 3, border_mode='valid')
+	model.add(Convolution2D(64, 3, 3, border_mode='valid'))
 	model.add(Activation('relu'))
 
-	model.add(Convolution2D(64, 3, 3, border_mode='valid')
+	model.add(Convolution2D(64, 3, 3, border_mode='valid'))
 	model.add(Activation('relu'))
 
 	model.add(Flatten())
