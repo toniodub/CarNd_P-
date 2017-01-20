@@ -157,17 +157,11 @@ if INIT_MODEL==1:
 	model.compile(Adam(lr=0.002), 'mse')
 else:
 	with open('model.json', 'r') as jfile:
-        # NOTE: if you saved the file by calling json.dump(model.to_json(), ...)
-        # then you will have to call:
-        #
+       
         	model = model_from_json(json.loads(jfile.read()))
-        #
-        # instead.
-        #model = model_from_json(jfile.read())
 
-
-    	model.compile("adam", "mse")
-    	model.load_weights('model.h5')
+	model.compile("adam", "mse")
+	model.load_weights('model.h5')
 
 
 datagen.fit(X_train)
