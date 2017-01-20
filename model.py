@@ -19,6 +19,7 @@ from keras.models import load_model
 from keras.models import model_from_json
 from keras.optimizers import *
 from sklearn.utils import shuffle
+from io import BytesIO
 
 INIT_MODEL=1
 
@@ -36,7 +37,7 @@ imageFolderPath = 'data/IMG/'
 imagePath = glob.glob(imageFolderPath+'center*.jpg') 
 
 #load and crop the data to remove sky and car
-X_data_center = np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
+X_data_center = np.array( [np.array((Image.open(BytesIO(base64.b64decode(imgString[i])))).crop((0,60,320,135))) for i in range(len(imagePath))])
 
 #load output
 with open('data/driving_log.csv') as csv_file:
@@ -100,7 +101,7 @@ steering_train = steering_data[1500:-1]
 
 #preprocessing
 datagen = ImageDataGenerator(
-        rotation_range=20,
+        rotation_range=5,
         height_shift_range=0.2,
         rescale=1./255,
         fill_mode='nearest')
@@ -148,7 +149,7 @@ if INIT_MODEL==0:
 	model.add(Dense(1))
 
 	#compile model
-	model.compile(Adam(lr=0.01), 'mse')
+	model.compile(A'adam', 'mse')
 else:
 	print('loading model')
 	with open('model.json', 'r') as jfile:
@@ -162,12 +163,12 @@ else:
 datagen.fit(X_train)
 
 print('start training')
-nb_epoch=10
+nb_epoch=1
 batch_size=256
 
 val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
 
-for steering_th in range(10,5,-5):
+for steering_th in range(20,15,-5):
 	print('steering threshold:')
 	print(steering_th/100)
 	[X_train_temp, steering_train_temp]=steering_filtering(X_train,steering_train,steering_th/100)
