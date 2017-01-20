@@ -21,7 +21,7 @@ from keras.optimizers import *
 from sklearn.utils import shuffle
 from io import BytesIO
 
-INIT_MODEL=1
+INIT_MODEL=0
 
 # function that sort the input based on the steering value
 def steering_filtering(X, y, steering):
@@ -149,7 +149,7 @@ if INIT_MODEL==0:
 	model.add(Dense(1))
 
 	#compile model
-	model.compile(A'adam', 'mse')
+	model.compile('adam', 'mse')
 else:
 	print('loading model')
 	with open('model.json', 'r') as jfile:
@@ -163,12 +163,12 @@ else:
 datagen.fit(X_train)
 
 print('start training')
-nb_epoch=1
+nb_epoch=5
 batch_size=256
 
 val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
 
-for steering_th in range(20,15,-5):
+for steering_th in range(5,0,-5):
 	print('steering threshold:')
 	print(steering_th/100)
 	[X_train_temp, steering_train_temp]=steering_filtering(X_train,steering_train,steering_th/100)
