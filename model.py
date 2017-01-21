@@ -38,7 +38,7 @@ imageFolderPath = 'data/IMG/'
 imagePath = glob.glob(imageFolderPath+'center*.jpg') 
 
 #load and crop the data to remove sky and car
-X_data_center = np.array( [np.array((Image.open(BytesIO(base64.b64decode(imagePath[i])))).crop((0,60,320,135))) for i in range(len(imagePath))])
+X_data_center = np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
 
 #load output
 with open('data/driving_log.csv') as csv_file:
