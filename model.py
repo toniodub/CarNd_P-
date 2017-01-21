@@ -52,12 +52,12 @@ with open('data/driving_log.csv') as csv_file:
 imagePath = glob.glob(imageFolderPath+'left*.jpg') 
 #load and crop the data to remove sky and car
 X_data_left = np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
-steering_data_left=steering_data_center-0.25
+steering_data_left=np.copy(steering_data_center)+0.25
 
 #load data right
 imagePath = glob.glob(imageFolderPath+'right*.jpg') 
 X_data_right=np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
-steering_data_right=steering_data_center+0.25
+steering_data_right=np.copy(steering_data_center)-0.25
 
 
 
@@ -72,11 +72,12 @@ for n in range(np.shape(X_data_temp)[0]):
 	X_data_flip[n,:,:,1]=cv2.flip(X_data_temp[n,:,:,1],flipCode=1)
 	X_data_flip[n,:,:,2]=cv2.flip(X_data_temp[n,:,:,2],flipCode=1)
 
-steering_data_flip=-steering_data_temp
+#TODO: change here
+steering_data_flip=-np.copy(steering_data_temp)
 
 X_data=(np.concatenate((X_data_temp,X_data_flip))).astype(np.uint8)
 steering_data=np.concatenate((steering_data_temp,steering_data_flip))
-steering_data=steering_data*100
+steering_data=steering_data*10
 steering_data=steering_data*steering_data*steering_data
 
 #shuffle data
