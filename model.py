@@ -63,7 +63,7 @@ shape_data=np.shape(X_data_center)
 shape_out=np.shape(steering_data_center)
 
 print('preprocessing data')
-X_data_temp=np.array([],dtype=np.float32).reshape(shape_data[0]*3,shape_data[1],shape_data[2],shape_data[3])
+X_data_temp=np.array([shape_data[0]*3,shape_data[1],shape_data[2],shape_data[3]],dtype=np.float32)
 X_data_temp=np.concatenate((X_data_center,X_data_right,X_data_left))
 
 steering_data_temp=np.array([],dtype=np.float32).reshape(shape_out[0]*3)
@@ -78,7 +78,7 @@ for n in range(np.shape(X_data_temp)[0]):
 
 steering_data_flip=-np.copy(steering_data_temp)
 
-X_data=np.array([],dtype=np.float32).reshape(shape_data[0]*6,shape_data[1],shape_data[2],shape_data[3])
+X_data=np.array([shape_data[0]*6,shape_data[1],shape_data[2],shape_data[3]],dtype=np.float32)
 X_data=(np.concatenate((X_data_temp,X_data_flip))).astype(np.uint8)
 
 steering_data_temp=np.array([],dtype=np.float32).reshape(shape_out[0]*6)
