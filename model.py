@@ -52,12 +52,12 @@ with open('data/driving_log.csv') as csv_file:
 imagePath = glob.glob(imageFolderPath+'left*.jpg') 
 #load and crop the data to remove sky and car
 X_data_left = np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
-steering_data_left=steering_data_center+0.25
+steering_data_left=steering_data_center-0.25
 
 #load data right
 imagePath = glob.glob(imageFolderPath+'right*.jpg') 
 X_data_right=np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])
-steering_data_right=steering_data_center-0.25
+steering_data_right=steering_data_center+0.25
 
 
 
