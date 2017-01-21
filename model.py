@@ -38,7 +38,7 @@ imageFolderPath = 'data/IMG/'
 imagePath = glob.glob(imageFolderPath+'center*.jpg') 
 
 #load and crop the data to remove sky and car
-X_data_center = np.array( [np.array((Image.open(BytesIO(base64.b64decode(imgString[i])))).crop((0,60,320,135))) for i in range(len(imagePath))])
+X_data_center = np.array( [np.array((Image.open(BytesIO(base64.b64decode(imagePath[i])))).crop((0,60,320,135))) for i in range(len(imagePath))])
 
 #load output
 with open('data/driving_log.csv') as csv_file:
@@ -74,8 +74,9 @@ for n in range(np.shape(X_data_temp)[0]):
 
 steering_data_flip=-steering_data_temp
 
-X_data=np.concatenate((X_data_temp,X_data_flip))
+X_data=(np.concatenate((X_data_temp,X_data_flip))).astype(np.uint8)
 steering_data=np.concatenate((steering_data_temp,steering_data_flip))
+steering_data=steering_data*10
 
 #shuffle data
 X_data, steering_data = shuffle(X_data, steering_data) 
@@ -165,7 +166,7 @@ datagen.fit(X_train)
 
 print('start training')
 nb_epoch=5
-batch_size=256
+batch_size=32
 
 val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
 
