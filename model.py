@@ -38,7 +38,7 @@ imageFolderPath = 'data/IMG/'
 imagePath = glob.glob(imageFolderPath+'center*.jpg') 
 
 #load and crop the data to remove sky and car
-X_data_center = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])).astype(np.dfloat32)
+X_data_center = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])).astype(np.float32)
 
 #load output
 with open('data/driving_log.csv') as csv_file:
@@ -51,26 +51,26 @@ with open('data/driving_log.csv') as csv_file:
 #load data left
 imagePath = glob.glob(imageFolderPath+'left*.jpg') 
 #load and crop the data to remove sky and car
-X_data_left = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])).astype(np.dfloat32)
+X_data_left = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])).astype(np.float32)
 steering_data_left=np.copy(steering_data_center)+0.25
 
 #load data right
 imagePath = glob.glob(imageFolderPath+'right*.jpg') 
-X_data_right=(np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])).astype(np.dfloat32)
+X_data_right=(np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])).astype(np.float32)
 steering_data_right=np.copy(steering_data_center)-0.25
 
 shape_data=np.shape(X_data_center)
 shape_out=np.shape(steering_data_center)
 
 print('preprocessing data')
-X_data_temp=np.array([],dtype=np.dfloat32).reshape(shape[0]*3,shape[1],shape[2],shape[3])
+X_data_temp=np.array([],dtype=np.float32).reshape(shape[0]*3,shape[1],shape[2],shape[3])
 X_data_temp=np.concatenate((X_data_center,X_data_right,X_data_left))
 
-steering_data_temp=np.array([],dtype=np.dfloat32).reshape(shape_out[0]*3)
+steering_data_temp=np.array([],dtype=np.float32).reshape(shape_out[0]*3)
 steering_data_temp=np.concatenate((steering_data_center,steering_data_right,steering_data_left))
 
 #flipping image
-X_data_flip=np.zeros(np.shape(X_data_temp),dtype=np.dfloat32)
+X_data_flip=np.zeros(np.shape(X_data_temp),dtype=np.float32)
 for n in range(np.shape(X_data_temp)[0]):
 	X_data_flip[n,:,:,0]=cv2.flip(X_data_temp[n,:,:,0],flipCode=1)
 	X_data_flip[n,:,:,1]=cv2.flip(X_data_temp[n,:,:,1],flipCode=1)
@@ -78,10 +78,10 @@ for n in range(np.shape(X_data_temp)[0]):
 
 steering_data_flip=-np.copy(steering_data_temp)
 
-X_data=np.array([],dtype=np.dfloat32).reshape(shape[0]*6,shape[1],shape[2],shape[3])
+X_data=np.array([],dtype=np.float32).reshape(shape[0]*6,shape[1],shape[2],shape[3])
 X_data=(np.concatenate((X_data_temp,X_data_flip))).astype(np.uint8)
 
-steering_data_temp=np.array([],dtype=np.dfloat32).reshape(shape_out[0]*6)
+steering_data_temp=np.array([],dtype=np.float32).reshape(shape_out[0]*6)
 steering_data=np.concatenate((steering_data_temp,steering_data_flip))
 
 steering_data=steering_data*10
