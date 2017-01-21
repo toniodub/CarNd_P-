@@ -18,6 +18,8 @@ from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_a
 import tensorflow as tf
 tf.python.control_flow_ops = tf
 
+import recursive_filter
+
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -39,18 +41,17 @@ def telemetry(sid, data):
     image= image.crop((0,60,320,135))
     image_array = (np.asarray(image)).astype(np.uint8)
     transformed_image_array = image_array[None, :, :, :]
-    #img = Image.fromarray(image_array)
-    #img.show()
 
     
     # This model currently assumes that the features of the model are just the images. Feel free to change this.
     steering_angle_up = float(model.predict(transformed_image_array, batch_size=1))
     # The driving model currently just outputs a constant throttle. Feel free to edit this.
-    throttle = 0.2/(1.0+abs(steering_angle_up*100))
-    steering_angle_up=steering_angle_up*100
-    #steering_angle_out=steering_angle_up+steering_angle_out*9  
-    print(steering_angle_up*steering_angle_up*1000, throttle)
-    send_control(steering_angle_up*steering_angle_up*steering_angle_up, throttle)
+    throttle = 0.2/(1.0+abs(steering_angle_up))
+
+    steering_angle_new=steer_filter.update_filter(steering_angle_up*steering_angle_up*steering_angle_up)
+ 
+    print(steering_angle_new, throttle)
+    send_control(steering_angle_new, throttle)
 
 
 @sio.on('connect')
@@ -67,6 +68,9 @@ def send_control(steering_angle, throttle):
 
 
 if __name__ == '__main__':
+
+    steer_filter=recursive_filter.Filter(0.5,1,0.0)
+
     parser = argparse.ArgumentParser(description='Remote Driving')
     parser.add_argument('model', type=str,
     help='Path to model definition json. Model weights should be on the same path.')

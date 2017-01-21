@@ -76,7 +76,8 @@ steering_data_flip=-steering_data_temp
 
 X_data=(np.concatenate((X_data_temp,X_data_flip))).astype(np.uint8)
 steering_data=np.concatenate((steering_data_temp,steering_data_flip))
-steering_data=steering_data*10
+steering_data=steering_data*100
+steering_data=steering_data*steering_data*steering_data
 
 #shuffle data
 X_data, steering_data = shuffle(X_data, steering_data) 
