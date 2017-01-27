@@ -182,7 +182,7 @@ else:
 datagen.fit(X_train)
 
 print('start training')
-nb_epochs=10
+nb_epochs=5
 batch_size=128
 
 #val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
@@ -193,9 +193,9 @@ for n in range(-5,-10,-5):
 	steering_th=n/10.0
 	steering_th=steering_th*steering_th*steering_th
 	print(np.shape(X_train))
-	[X_train_temp, steering_train_temp]=steering_filtering(X_train,steering_train,steering_th)
-	datagen.fit(X_train_temp)
-	train_gen=datagen.flow(X_train_temp, steering_train_temp, batch_size=batch_size)
+	#[X_train_temp, steering_train_temp]=steering_filtering(X_train,steering_train,steering_th)
+	#datagen.fit(X_train_temp)
+	train_gen=datagen.flow(X_train, steering_train, batch_size=batch_size)
 
 	# fits the model on batches with real-time data augmentation:
 	model.fit_generator(train_gen, samples_per_epoch=min(len(X_train_temp),NUMBER_PHOTO), nb_epoch=nb_epochs)
