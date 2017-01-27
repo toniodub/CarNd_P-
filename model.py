@@ -168,7 +168,7 @@ if INIT_MODEL==0:
 	model.add(Dense(1))
 
 	#compile model
-	model.compile(Adam(lr=0.00001), 'mse')
+	model.compile(Adam(lr=0.0000001), 'mse')
 else:
 	print('loading model')
 	with open('model.json', 'r') as jfile:
