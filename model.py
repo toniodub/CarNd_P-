@@ -198,7 +198,7 @@ for n in range(-5,-10,-5):
 	train_gen=datagen.flow(X_train, steering_train, batch_size=batch_size)
 
 	# fits the model on batches with real-time data augmentation:
-	model.fit_generator(train_gen, samples_per_epoch=min(len(X_train_temp),NUMBER_PHOTO), nb_epoch=nb_epochs)
+	model.fit_generator(train_gen, samples_per_epoch=min(len(X_train),NUMBER_PHOTO), nb_epoch=nb_epochs)
 	
 
 print()
