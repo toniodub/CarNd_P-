@@ -38,7 +38,7 @@ with open('data/driving_log.csv') as csv_file:
 #filtering
 steering_data_center_temp=np.copy(steering_data_center)
 for n in range(2,len(steering_data_center)-2):
-	steering_data_center_temp[n]=steering_data_center[n-2]+steering_data_center[n-1]+steering_data_center[n]+steering_data_center[n+1]+steering_data_center[n+2]
+	steering_data_center_temp[n]=(steering_data_center[n-2]+steering_data_center[n-1]+steering_data_center[n]+steering_data_center[n+1]+steering_data_center[n+2])/5
 
 steering_data_center=np.copy(steering_data_center_temp)
 
@@ -166,7 +166,7 @@ if INIT_MODEL==0:
 	model.add(Dense(1))
 
 	#compile model
-	model.compile(Adam(lr=1e-9), 'mse')
+	model.compile(Adam(lr=1e-7), 'mse')
 else:
 	print('loading model')
 	with open('model.json', 'r') as jfile:
