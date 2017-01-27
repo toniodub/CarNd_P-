@@ -20,7 +20,7 @@ from keras.optimizers import *
 from sklearn.utils import shuffle
 
 INIT_MODEL=0
-NUMBER_PHOTO=100
+NUMBER_PHOTO=30
 
 def steering_filtering(X, y, steering):
 	index_out=np.where(abs(y)>=(steering))
@@ -33,9 +33,7 @@ def steering_filtering(X, y, steering):
 with open('data/driving_log.csv') as csv_file:
 	df = pd.read_csv(csv_file)
 	steering_data_center = ((df.steering.values).astype(np.float32))[0:NUMBER_PHOTO]
-	throttle_data = df.throttle.values
-	brake_data = df.brake.values
-	speed_data = df.speed.values
+	
 
 #filtering
 steering_data_center_temp=np.copy(steering_data_center)
@@ -65,10 +63,10 @@ shape_data=np.shape(X_data_center)
 shape_out=np.shape(steering_data_center)
 
 #concatenate data
-X_data_temp=np.array([shape_data[0]*3,shape_data[1],shape_data[2],shape_data[3]],dtype=np.float32)
+X_data_temp=np.array((shape_data[0]*3,shape_data[1],shape_data[2],shape_data[3]),dtype=np.float32)
 X_data_temp=np.concatenate((X_data_center,X_data_right,X_data_left))
 
-steering_data_temp=np.array([shape_out[0]*3],dtype=np.float32)
+steering_data_temp=np.array((shape_out[0]*3),dtype=np.float32)
 steering_data_temp=np.concatenate((steering_data_center,steering_data_right,steering_data_left))
 
 #flipping image
@@ -81,10 +79,10 @@ for n in range(np.shape(X_data_temp)[0]):
 steering_data_flip=-np.copy(steering_data_temp)
 
 #concatenate fliping
-X_data=np.array([shape_data[0]*6,shape_data[1],shape_data[2],shape_data[3]],dtype=np.float32)
+X_data=np.array((shape_data[0]*6,shape_data[1],shape_data[2],shape_data[3]),dtype=np.float32)
 X_data=(np.concatenate((X_data_temp,X_data_flip))).astype(np.float32)
 
-steering_data=np.array([shape_out[0]*3],dtype=np.float32)
+steering_data=np.array((shape_out[0]*3),dtype=np.float32)
 steering_data=np.concatenate((steering_data_temp,steering_data_flip))
 
 #steering_data=steering_data*10
