@@ -1,10 +1,10 @@
 #! /usr/bin/env python3
 
 #file containing the The script used to create and train the model.
-
+import cv2
 from PIL import Image                                                            
 import numpy as np                                                                     
-import matplotlib.pyplot as plt                                                  
+#import matplotlib.pyplot as plt                                                  
 import glob
 import csv
 import pandas as pd
@@ -16,12 +16,14 @@ from keras.layers.core import Dense, Activation, Flatten, Dropout
 from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 from keras.models import load_model
+from keras.optimizers import *
 from sklearn.utils import shuffle
 
 INIT_MODEL=0
+NUMBER_PHOTO=1000
 
 def steering_filtering(X, y, steering):
-	index_out=np.where(abs(y)>=steering)
+	index_out=np.where(abs(y)>=(steering))
 	y_out=y[index_out[0]]
 	X_out=X[index_out[0]]
 	return X_out, y_out
@@ -30,7 +32,7 @@ def steering_filtering(X, y, steering):
 #load output
 with open('data/driving_log.csv') as csv_file:
 	df = pd.read_csv(csv_file)
-	steering_data_center = (df.steering.values).astype(np.float32)
+	steering_data_center = ((df.steering.values).astype(np.float32))[0:NUMBER_PHOTO]
 	throttle_data = df.throttle.values
 	brake_data = df.brake.values
 	speed_data = df.speed.values
@@ -47,16 +49,16 @@ imageFolderPath = 'data/IMG/'
 
 imagePath = glob.glob(imageFolderPath+'center*.jpg') 
 #load and crop the data to remove sky and car
-X_data_center = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])).astype(np.float32)
+X_data_center = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(NUMBER_PHOTO)])).astype(np.float32)
 
 imagePath = glob.glob(imageFolderPath+'left*.jpg') 
 #load and crop the data to remove sky and car
-X_data_left = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])).astype(np.float32)
+X_data_left = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(NUMBER_PHOTO)])).astype(np.float32)
 steering_data_left=np.copy(steering_data_center)+0.25
 
 imagePath = glob.glob(imageFolderPath+'right*.jpg') 
 #load and crop the data to remove sky and car
-X_data_right = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(len(imagePath))])).astype(np.float32)
+X_data_right = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(NUMBER_PHOTO)])).astype(np.float32)
 steering_data_right=np.copy(steering_data_center)-0.25
 
 shape_data=np.shape(X_data_center)
@@ -82,7 +84,7 @@ steering_data_flip=-np.copy(steering_data_temp)
 X_data=np.array([shape_data[0]*6,shape_data[1],shape_data[2],shape_data[3]],dtype=np.float32)
 X_data=(np.concatenate((X_data_temp,X_data_flip))).astype(np.float32)
 
-steering_data_temp=np.array([shape_out[0]*3],dtype=np.float32)
+steering_data=np.array([shape_out[0]*3],dtype=np.float32)
 steering_data=np.concatenate((steering_data_temp,steering_data_flip))
 
 #steering_data=steering_data*10
@@ -97,17 +99,17 @@ steering_data=steering_data*10
 steering_data=steering_data*steering_data*steering_data
 
 #create test data separated from validation
-X_test=X_data[0:1000]
-steering_test = steering_data[0:1000]
+X_test=X_data[0:100]
+steering_test = steering_data[0:100]
 #throttle_test = throttle_data[0:1000]
 #brake_test = brake_data[0:1000]
 #speed_test = speed_data[0:1000]
 
-X_val=X_data[1000:1500]
-steering_val = steering_data[1000:1500]
+#X_val=X_data[1000:1500]
+#steering_val = steering_data[1000:1500]
 
-X_train=X_data[1500:-1]
-steering_train = steering_data[1500:-1]
+X_train=X_data[100:-1]
+steering_train = steering_data[100:-1]
 #throttle_train = throttle_data[1000:-1]
 #brake_train = brake[1000:-1]
 #speed_train = speed[1000:-1]
@@ -166,7 +168,7 @@ if INIT_MODEL==0:
 	model.add(Dense(1))
 
 	#compile model
-	model.compile(Adam(lr=0.001), 'mse')
+	model.compile(Adam(lr=0.0001), 'mse')
 else:
 	print('loading model')
 	with open('model.json', 'r') as jfile:
@@ -180,23 +182,24 @@ else:
 datagen.fit(X_train)
 
 print('start training')
-nb_epoch=5
+nb_epochs=5
 batch_size=64
 
-val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
+#val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
 
 for n in range(-5,-10,-5):
 	print('steering threshold:')
-	print(steering_th/100)
-	steering_th=n/10
+	print(max(0,n/100))
+	steering_th=n/10.0
 	steering_th=steering_th*steering_th*steering_th
+	print(np.shape(X_train))
 	[X_train_temp, steering_train_temp]=steering_filtering(X_train,steering_train,steering_th)
 	datagen.fit(X_train_temp)
 	train_gen=datagen.flow(X_train_temp, steering_train_temp, batch_size=batch_size)
 
 	# fits the model on batches with real-time data augmentation:
-	model.fit_generator(train_gen, samples_per_epoch=min(len(X_train_temp),20000), nb_epoch=nb_epoch)
-	gc.collect()
+	model.fit_generator(train_gen, samples_per_epoch=min(len(X_train_temp),NUMBER_PHOTO), nb_epoch=nb_epochs)
+	
 
 print()
 
