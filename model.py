@@ -181,7 +181,7 @@ else:
 datagen.fit(X_train)
 
 print('start training')
-nb_epochs=50
+nb_epochs=4
 batch_size=128
 
 #val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
