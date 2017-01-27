@@ -116,7 +116,7 @@ steering_train = steering_data[100:-1]
 
 #preprocessing
 datagen = ImageDataGenerator(
-        rotation_range=5,
+        rotation_range=1,
         width_shift_range=0,
         height_shift_range=0,
         #rescale=1./255,
@@ -168,7 +168,7 @@ if INIT_MODEL==0:
 	model.add(Dense(1))
 
 	#compile model
-	model.compile(Adam(lr=0.0000001), 'mse')
+	model.compile(Adam(lr=0.000000001), 'mse')
 else:
 	print('loading model')
 	with open('model.json', 'r') as jfile:
