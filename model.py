@@ -20,7 +20,7 @@ from keras.optimizers import *
 from sklearn.utils import shuffle
 
 INIT_MODEL=0
-NUMBER_PHOTO=1000
+NUMBER_PHOTO=2000
 
 def steering_filtering(X, y, steering):
 	index_out=np.where(abs(y)>=(steering))
@@ -168,7 +168,7 @@ if INIT_MODEL==0:
 	model.add(Dense(1))
 
 	#compile model
-	model.compile(Adam(lr=0.0001), 'mse')
+	model.compile(Adam(lr=0.00001), 'mse')
 else:
 	print('loading model')
 	with open('model.json', 'r') as jfile:
@@ -182,8 +182,8 @@ else:
 datagen.fit(X_train)
 
 print('start training')
-nb_epochs=5
-batch_size=64
+nb_epochs=10
+batch_size=128
 
 #val_gen=datagen.flow(X_val, steering_val, batch_size=batch_size)
 
