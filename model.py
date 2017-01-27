@@ -20,7 +20,7 @@ from keras.optimizers import *
 from sklearn.utils import shuffle
 
 INIT_MODEL=0
-NUMBER_PHOTO=2000
+NUMBER_PHOTO=1000
 
 def steering_filtering(X, y, steering):
 	index_out=np.where(abs(y)>=(steering))
