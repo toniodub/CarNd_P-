@@ -19,8 +19,8 @@ from keras.models import load_model
 from keras.optimizers import *
 from sklearn.utils import shuffle
 
-INIT_MODEL=0
-NUMBER_PHOTO=100
+INIT_MODEL=1
+NUMBER_PHOTO=1000
 
 def steering_filtering(X, y, steering):
 	index_out=np.where(abs(y)>=(steering))
@@ -166,7 +166,7 @@ if INIT_MODEL==0:
 	model.add(Dense(1))
 
 	#compile model
-	model.compile(Adam(lr=1e-6), 'mse')
+	model.compile(Adam(lr=1e-8), 'mse')
 else:
 	print('loading model')
 	with open('model.json', 'r') as jfile:
