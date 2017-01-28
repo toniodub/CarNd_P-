@@ -22,6 +22,7 @@ from sklearn.utils import shuffle
 
 INIT_MODEL=1
 NUMBER_PHOTO=1000
+OFFSET=1000
 
 def steering_filtering(X, y, steering):
 	index_out=np.where(abs(y)>=(steering))
@@ -33,7 +34,7 @@ def steering_filtering(X, y, steering):
 #load output
 with open('data/driving_log.csv') as csv_file:
 	df = pd.read_csv(csv_file)
-	steering_data_center = ((df.steering.values).astype(np.float32))[0:NUMBER_PHOTO]
+	steering_data_center = ((df.steering.values).astype(np.float32))[OFFSET:NUMBER_PHOTO+OFFSET]
 	
 
 #filtering
@@ -48,16 +49,16 @@ imageFolderPath = 'data/IMG/'
 
 imagePath = glob.glob(imageFolderPath+'center*.jpg') 
 #load and crop the data to remove sky and car
-X_data_center = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(NUMBER_PHOTO)])).astype(np.float32)
+X_data_center = (np.array( [np.array((Image.open(imagePath[i+OFFSET])).crop((0,60,320,135))) for i in range(NUMBER_PHOTO)])).astype(np.float32)
 
 imagePath = glob.glob(imageFolderPath+'left*.jpg') 
 #load and crop the data to remove sky and car
-X_data_left = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(NUMBER_PHOTO)])).astype(np.float32)
+X_data_left = (np.array( [np.array((Image.open(imagePath[i+OFFSET])).crop((0,60,320,135))) for i in range(NUMBER_PHOTO)])).astype(np.float32)
 steering_data_left=np.copy(steering_data_center)+0.25
 
 imagePath = glob.glob(imageFolderPath+'right*.jpg') 
 #load and crop the data to remove sky and car
-X_data_right = (np.array( [np.array((Image.open(imagePath[i])).crop((0,60,320,135))) for i in range(NUMBER_PHOTO)])).astype(np.float32)
+X_data_right = (np.array( [np.array((Image.open(imagePath[i+OFFSET])).crop((0,60,320,135))) for i in range(NUMBER_PHOTO)])).astype(np.float32)
 steering_data_right=np.copy(steering_data_center)-0.25
 
 shape_data=np.shape(X_data_center)
