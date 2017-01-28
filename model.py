@@ -22,7 +22,7 @@ from sklearn.utils import shuffle
 
 INIT_MODEL=1
 NUMBER_PHOTO=1000
-OFFSET=1000
+OFFSET=2000
 
 def steering_filtering(X, y, steering):
 	index_out=np.where(abs(y)>=(steering))
